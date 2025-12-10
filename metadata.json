@@ -1,0 +1,7 @@
+{
+  "name": "SmartCart AI",
+  "description": "Um assistente inteligente de compras de supermercado que usa visão computacional para extrair nomes e preços de produtos a partir de fotos, organizando-os em uma lista interativa.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
