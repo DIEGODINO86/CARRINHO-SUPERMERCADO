@@ -340,116 +340,245 @@ const App: React.FC = () => {
   const triggerGallery = () => galleryInputRef.current?.click();
   const triggerListImport = () => listImportInputRef.current?.click();
 
-  return (
-    <div className="min-h-screen pb-44 max-w-md mx-auto bg-gray-50 flex flex-col relative shadow-2xl">
-      
-      {/* Header Compacto */}
-      <header className="bg-brand-600 text-white pt-4 pb-12 px-5 sticky top-0 z-20 rounded-b-[2rem] shadow-lg">
-        <div className="flex justify-between items-center mb-1">
-          <div className="flex items-center gap-2">
-            <div className="bg-white/20 p-2 rounded-xl">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            </div>
-            <div>
-               <h1 className="text-lg font-bold tracking-tight leading-none">SmartCart</h1>
-               <span className="text-brand-200 text-xs font-medium">Seu assistente de economia</span>
-            </div>
-          </div>
-          
-          <div className="flex gap-2">
-             <button
-                onClick={() => setIsShoppingListModalOpen(true)}
-                className="bg-brand-500 hover:bg-brand-400 p-2.5 rounded-full transition-colors shadow-sm text-white relative"
-                aria-label="Minha Lista"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                {shoppingList.length > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-400 rounded-full border border-brand-600"></span>}
-            </button>
-            {items.length > 0 && (
-              <>
-                <button
-                    onClick={handleShareList}
-                    className="bg-brand-500 hover:bg-brand-400 p-2.5 rounded-full transition-colors shadow-sm text-white"
-                    aria-label="Compartilhar"
-                >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                </button>
-                <button 
-                    onClick={handleFinalize} 
-                    className="bg-brand-500 hover:bg-brand-400 p-2.5 rounded-full transition-colors shadow-sm text-white"
-                    aria-label="Gerar PDF"
-                >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                </button>
-                <button onClick={handleClearAll} className="bg-brand-700 hover:bg-brand-800 p-2.5 rounded-full shadow-sm text-brand-200 hover:text-white">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                </button>
-              </>
-            )}
-          </div>
-        </div>
+  // Reusable Component for Action Buttons
+  const ActionButtons = ({ layout = "grid" }: { layout?: "grid" | "stack" }) => (
+    <div className={layout === "grid" ? "grid grid-cols-4 gap-2 items-stretch" : "flex flex-col gap-3"}>
+       {/* Manual */}
+       <button 
+          onClick={() => setIsManualModalOpen(true)}
+          className={`flex flex-col items-center justify-center gap-1 rounded-xl active:bg-gray-100 py-2 text-gray-500 hover:text-brand-600 transition-colors ${layout === 'grid' ? 'col-span-1' : 'flex-row w-full justify-start px-4 hover:bg-gray-50 border border-gray-100'}`}
+       >
+           <div className={`bg-gray-100 p-2 rounded-lg text-gray-600 ${layout === 'stack' ? 'bg-transparent' : ''}`}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+           </div>
+           <span className={`${layout === 'grid' ? 'text-[10px] font-bold' : 'text-sm font-medium'}`}>Manual</span>
+       </button>
 
-        {/* Action Bar inside Header (Compare / Hints) */}
-        {Object.keys(comparisonGroups).length > 0 && (
-            <div className="mt-4 flex justify-center">
-                 <button onClick={() => setIsComparisonModalOpen(true)} className="bg-brand-700/50 hover:bg-brand-700/70 text-white text-xs px-4 py-1.5 rounded-full flex items-center gap-1.5 backdrop-blur-sm border border-brand-500/30 transition-all">
-                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-                     Ver Comparativo de Preços
-                 </button>
+       {/* Upload */}
+       <button 
+          onClick={triggerGallery}
+          disabled={status.isAnalyzing}
+          className={`flex flex-col items-center justify-center gap-1 rounded-xl active:bg-gray-100 py-2 text-gray-500 hover:text-brand-600 transition-colors ${layout === 'grid' ? 'col-span-1' : 'flex-row w-full justify-start px-4 hover:bg-gray-50 border border-gray-100'}`}
+       >
+           <div className={`bg-gray-100 p-2 rounded-lg text-gray-600 ${layout === 'stack' ? 'bg-transparent' : ''}`}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+           </div>
+           <span className={`${layout === 'grid' ? 'text-[10px] font-bold' : 'text-sm font-medium'}`}>Arquivo / PDF</span>
+       </button>
+
+       {/* Camera (Big Button) */}
+       <button 
+          onClick={triggerCamera}
+          disabled={status.isAnalyzing}
+          className={`bg-brand-600 active:bg-brand-700 text-white rounded-2xl shadow-lg shadow-brand-200 flex flex-col items-center justify-center gap-1 transform transition-transform active:scale-95 ${layout === 'grid' ? 'col-span-2' : 'w-full py-4 order-first'}`}
+       >
+           {status.isAnalyzing ? (
+               <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"/>
+           ) : (
+               <div className="flex items-center gap-2">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  <span className="font-bold text-sm">Escanear Produto</span>
+               </div>
+           )}
+       </button>
+    </div>
+  );
+
+  // Reusable Budget Display
+  const BudgetSummary = () => (
+     <div 
+        onClick={() => { setTempBudget(budget ? budget.toString() : ''); setIsBudgetModalOpen(true); }}
+        className="cursor-pointer group"
+    >
+         <div className="flex justify-between items-end mb-2">
+            <div>
+               <span className="text-xs uppercase font-bold text-gray-400 tracking-wider block mb-1">Total Carrinho</span>
+               <span className="text-3xl font-bold text-gray-900 leading-none">{formatCurrency(totalCost)}</span>
             </div>
-        )}
+            <div className="text-right">
+                <div className="flex items-center justify-end gap-1.5 text-xs uppercase font-bold text-gray-400 tracking-wider mb-1">
+                    <span>{budget ? 'Disponível' : 'Limite'}</span>
+                    <svg className="text-gray-300 group-hover:text-brand-500" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                </div>
+                {budget ? (
+                     <span className={`text-xl font-bold ${remainingBudget < 0 ? 'text-red-500' : 'text-brand-600'}`}>
+                        {remainingBudget < 0 ? '-' : ''}{formatCurrency(Math.abs(remainingBudget))}
+                     </span>
+                ) : (
+                    <span className="text-sm font-medium text-brand-600 bg-brand-50 px-2 py-1 rounded-md">Definir</span>
+                )}
+            </div>
+         </div>
+
+         {/* Progress Bar */}
+         {budget && (
+             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                 <div 
+                    className={`h-full transition-all duration-500 ${isOverBudget ? 'bg-red-500' : 'bg-brand-500'}`} 
+                    style={{ width: `${budgetPercentage}%` }}
+                 />
+             </div>
+         )}
+         {!budget && <div className="h-2 bg-gray-100 rounded-full"></div>}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+      
+      {/* --- HEADER RESPONSIVO --- */}
+      <header className="bg-brand-600 text-white sticky top-0 z-30 shadow-lg lg:static">
+        <div className="max-w-6xl mx-auto px-4 lg:px-6 py-4 lg:py-6">
+            <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                    <div className="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    </div>
+                    <div>
+                    <h1 className="text-xl lg:text-2xl font-bold tracking-tight leading-none">SmartCart</h1>
+                    <span className="text-brand-200 text-xs lg:text-sm font-medium">Seu assistente de economia</span>
+                    </div>
+                </div>
+                
+                <div className="flex gap-2">
+                    {Object.keys(comparisonGroups).length > 0 && (
+                         <button onClick={() => setIsComparisonModalOpen(true)} className="hidden lg:flex bg-brand-700/50 hover:bg-brand-700/70 text-white text-sm px-4 py-2.5 rounded-full items-center gap-2 backdrop-blur-sm border border-brand-500/30 transition-all mr-2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                            Comparar Preços
+                        </button>
+                    )}
+
+                    <button
+                        onClick={() => setIsShoppingListModalOpen(true)}
+                        className="bg-brand-500 hover:bg-brand-400 p-2.5 lg:px-4 lg:py-2.5 rounded-full lg:rounded-xl transition-colors shadow-sm text-white relative flex items-center gap-2"
+                        title="Minha Lista"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        <span className="hidden lg:inline font-medium">Minha Lista</span>
+                        {shoppingList.length > 0 && <span className="absolute top-0 right-0 w-3 h-3 bg-red-400 rounded-full border-2 border-brand-600"></span>}
+                    </button>
+                    {items.length > 0 && (
+                    <>
+                        <button
+                            onClick={handleShareList}
+                            className="bg-brand-500 hover:bg-brand-400 p-2.5 rounded-full transition-colors shadow-sm text-white"
+                            title="Compartilhar"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                        </button>
+                        <button 
+                            onClick={handleFinalize} 
+                            className="bg-brand-500 hover:bg-brand-400 p-2.5 rounded-full transition-colors shadow-sm text-white"
+                            title="Gerar PDF"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        </button>
+                        <button onClick={handleClearAll} className="bg-brand-700 hover:bg-brand-800 p-2.5 rounded-full shadow-sm text-brand-200 hover:text-white" title="Limpar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    </>
+                    )}
+                </div>
+            </div>
+             {/* Mobile Only: Compare Button below header */}
+             {Object.keys(comparisonGroups).length > 0 && (
+                <div className="mt-4 flex justify-center lg:hidden">
+                    <button onClick={() => setIsComparisonModalOpen(true)} className="bg-brand-700/50 hover:bg-brand-700/70 text-white text-xs px-4 py-1.5 rounded-full flex items-center gap-1.5 backdrop-blur-sm border border-brand-500/30 transition-all">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                        Ver Comparativo de Preços
+                    </button>
+                </div>
+            )}
+        </div>
       </header>
 
-      {/* Main Content (-margin top to overlap header) */}
-      <main className="flex-1 px-4 -mt-6 z-10 overflow-visible space-y-4">
+      {/* --- LAYOUT GRID (WEBSITE FORMAT) --- */}
+      <div className="flex-1 max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 lg:p-8">
         
-        {/* Error Feedback */}
-        {status.error && (
-          <div className="bg-white border-l-4 border-red-500 shadow-lg p-4 rounded-r-xl flex items-start gap-3 animate-fadeIn">
-             <div className="text-red-500 mt-0.5"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-             <div>
-                <h4 className="font-bold text-gray-800 text-sm">Atenção</h4>
-                <p className="text-gray-600 text-xs mt-0.5">{status.error}</p>
-             </div>
-          </div>
-        )}
-
-        {/* Loading State */}
-        {status.isAnalyzing && (
-          <div className="bg-white p-6 rounded-2xl shadow-lg text-center animate-fadeIn">
-            <LoadingSpinner />
-            {analyzingProgress && <p className="text-xs font-medium text-gray-500 mt-3 uppercase tracking-wide">Processando {analyzingProgress.current} de {analyzingProgress.total}</p>}
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!status.isAnalyzing && items.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
-            <div className="bg-white p-6 rounded-full shadow-sm mb-2">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        {/* LEFT COLUMN: CONTENT (Scan Results) */}
+        <main className="lg:col-span-8 space-y-4">
+            {/* Error Feedback */}
+            {status.error && (
+            <div className="bg-white border-l-4 border-red-500 shadow-sm p-4 rounded-r-xl flex items-start gap-3 animate-fadeIn">
+                <div className="text-red-500 mt-0.5"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                <div>
+                    <h4 className="font-bold text-gray-800 text-sm">Atenção</h4>
+                    <p className="text-gray-600 text-xs mt-0.5">{status.error}</p>
+                </div>
             </div>
-            <div>
-              <h3 className="text-gray-900 font-bold text-lg">Carrinho Vazio</h3>
-              <p className="text-gray-500 text-sm mt-1 max-w-[200px] mx-auto leading-relaxed">Toque em "Câmera" abaixo para começar a escanear produtos.</p>
-            </div>
-          </div>
-        )}
+            )}
 
-        {/* Items List */}
-        <div className="space-y-3 pb-4">
-          {items.map(item => (
-            <div key={item.id} className="animate-scaleIn">
-              <CartItemRow 
-                item={item} 
-                isBestValue={bestValueIds.has(item.id)}
-                isInWishlist={isItemInWishlist(item.productName)}
-                onUpdate={handleUpdateItem} 
-                onRemove={handleRemoveItem} 
-              />
+            {/* Loading State */}
+            {status.isAnalyzing && (
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center animate-fadeIn">
+                <LoadingSpinner />
+                {analyzingProgress && <p className="text-xs font-medium text-gray-500 mt-3 uppercase tracking-wide">Processando {analyzingProgress.current} de {analyzingProgress.total}</p>}
             </div>
-          ))}
+            )}
+
+            {/* Empty State */}
+            {!status.isAnalyzing && items.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16 text-center space-y-6 bg-white rounded-3xl border border-dashed border-gray-200 lg:h-96">
+                <div className="bg-gray-50 p-6 rounded-full">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                </div>
+                <div>
+                <h3 className="text-gray-900 font-bold text-xl mb-1">Seu carrinho está vazio</h3>
+                <p className="text-gray-500 text-sm max-w-xs mx-auto leading-relaxed">Adicione produtos usando a câmera, enviando arquivos ou digitando manualmente.</p>
+                </div>
+            </div>
+            )}
+
+            {/* Items List */}
+            <div className="space-y-3 pb-24 lg:pb-0">
+            {items.map(item => (
+                <div key={item.id} className="animate-scaleIn">
+                <CartItemRow 
+                    item={item} 
+                    isBestValue={bestValueIds.has(item.id)}
+                    isInWishlist={isItemInWishlist(item.productName)}
+                    onUpdate={handleUpdateItem} 
+                    onRemove={handleRemoveItem} 
+                />
+                </div>
+            ))}
+            </div>
+        </main>
+
+        {/* RIGHT COLUMN: SIDEBAR (Controls for Desktop) */}
+        <aside className="hidden lg:block lg:col-span-4 space-y-6">
+            <div className="sticky top-24 space-y-6">
+                {/* Dashboard Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
+                    <BudgetSummary />
+                    <hr className="border-gray-100"/>
+                    <ActionButtons layout="stack" />
+                </div>
+
+                {/* Info Card */}
+                {items.length > 0 && (
+                     <div className="bg-brand-50 rounded-2xl p-6 border border-brand-100 text-brand-800">
+                         <h4 className="font-bold flex items-center gap-2 mb-2">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            Dica
+                         </h4>
+                         <p className="text-sm opacity-90">Você pode comparar preços clicando no botão "Comparar Preços" no topo ou gerar um relatório PDF para seu controle.</p>
+                     </div>
+                )}
+            </div>
+        </aside>
+
+      </div>
+
+      {/* --- BOTTOM NAV (MOBILE ONLY) --- */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-40 pb-safe lg:hidden">
+        <div className="px-6 py-3 border-b border-gray-100 bg-gray-50/50">
+             <BudgetSummary />
         </div>
-      </main>
+        <div className="p-3">
+            <ActionButtons layout="grid" />
+        </div>
+      </div>
 
       {/* Hidden File Inputs */}
       <input type="file" ref={cameraInputRef} onChange={handleFileChange} accept="image/*" capture="environment" className="hidden" />
@@ -615,87 +744,6 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* --- NOVA BARRA DE CONTROLE (Footer) --- */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-40 pb-safe">
-        
-        {/* Orçamento (Budget Bar) */}
-        <div 
-            onClick={() => { setTempBudget(budget ? budget.toString() : ''); setIsBudgetModalOpen(true); }}
-            className="px-6 py-3 cursor-pointer border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-colors"
-        >
-             <div>
-                <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider block">Total Carrinho</span>
-                <span className="text-xl font-bold text-gray-900">{formatCurrency(totalCost)}</span>
-             </div>
-             
-             <div className="text-right">
-                <div className="flex items-center justify-end gap-1.5 text-[10px] uppercase font-bold text-gray-400 tracking-wider">
-                    <span>{budget ? 'Disponível' : 'Definir Limite'}</span>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                </div>
-                {budget ? (
-                     <span className={`text-lg font-bold ${remainingBudget < 0 ? 'text-red-500' : 'text-brand-600'}`}>
-                        {remainingBudget < 0 ? '-' : ''}{formatCurrency(Math.abs(remainingBudget))}
-                     </span>
-                ) : (
-                    <span className="text-sm font-medium text-brand-600">Toque para configurar</span>
-                )}
-             </div>
-
-             {/* Progress Bar (Absolute Bottom of this section) */}
-             {budget && (
-                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-100">
-                     <div 
-                        className={`h-full transition-all duration-500 ${isOverBudget ? 'bg-red-500' : 'bg-brand-500'}`} 
-                        style={{ width: `${budgetPercentage}%` }}
-                     />
-                 </div>
-             )}
-        </div>
-
-        {/* Action Buttons Grid */}
-        <div className="grid grid-cols-4 gap-2 p-3 items-stretch">
-             {/* Manual */}
-             <button 
-                onClick={() => setIsManualModalOpen(true)}
-                className="col-span-1 flex flex-col items-center justify-center gap-1 rounded-xl active:bg-gray-100 py-2 text-gray-500 hover:text-brand-600 transition-colors"
-             >
-                 <div className="bg-gray-100 p-2 rounded-lg text-gray-600">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                 </div>
-                 <span className="text-[10px] font-bold">Manual</span>
-             </button>
-
-             {/* Upload */}
-             <button 
-                onClick={triggerGallery}
-                disabled={status.isAnalyzing}
-                className="col-span-1 flex flex-col items-center justify-center gap-1 rounded-xl active:bg-gray-100 py-2 text-gray-500 hover:text-brand-600 transition-colors"
-             >
-                 <div className="bg-gray-100 p-2 rounded-lg text-gray-600">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                 </div>
-                 <span className="text-[10px] font-bold">Arquivo</span>
-             </button>
-
-             {/* Camera (Big Button) */}
-             <button 
-                onClick={triggerCamera}
-                disabled={status.isAnalyzing}
-                className="col-span-2 bg-brand-600 active:bg-brand-700 text-white rounded-2xl shadow-lg shadow-brand-200 flex flex-col items-center justify-center gap-1 transform transition-transform active:scale-95"
-             >
-                 {status.isAnalyzing ? (
-                     <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"/>
-                 ) : (
-                     <div className="flex items-center gap-2">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                        <span className="font-bold text-sm">Escanear</span>
-                     </div>
-                 )}
-             </button>
-        </div>
-      </div>
     </div>
   );
 };
