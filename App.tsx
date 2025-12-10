@@ -1,16 +1,11 @@
 import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { jsPDF } from "jspdf";
+import "jspdf-autotable"; // Importação de efeito colateral para estender o jsPDF
 import { CartItem, AnalysisState, ShoppingListItem } from './types';
 import { analyzeProductImage, extractShoppingList } from './services/geminiService';
 import { CartItemRow } from './components/CartItemRow';
 import { LoadingSpinner } from './components/LoadingSpinner';
-
-// Declaration for jsPDF loaded via CDN
-declare global {
-  interface Window {
-    jspdf: any;
-  }
-}
 
 const App: React.FC = () => {
   // Main Cart State
@@ -262,7 +257,6 @@ const App: React.FC = () => {
   const handleFinalize = () => {
     if (items.length === 0) return;
 
-    const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
     // Title
@@ -306,6 +300,7 @@ const App: React.FC = () => {
         formatCurrency(item.price * item.quantity)
     ]);
 
+    // Use autoTable via the imported module extension
     (doc as any).autoTable({
         startY: 75,
         head: [['Qtd', 'Produto', 'Preço Un.', 'Total']],
